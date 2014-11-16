@@ -1,6 +1,15 @@
 #include <QTRSensors.h>
 #include <Servo.h>
 
+/*
+EGR 101 Firefighting Challenge
+Dustin Steadman, Matthew Gileau, Sydney O'Neal
+17 November 2014
+
+*/
+
+// Original example source made available through Professor Brian Butka (?)
+
 // This example is designed for use with eight QTR-1RC sensors or the eight sensors of a
 // QTR-8RC module.  These reflectance sensors should be connected to digital inputs 3 to 10.
 // The QTR-8RC's emitter control pin (LEDON) can optionally be connected to digital pin 2, 
@@ -27,9 +36,12 @@ unsigned int sensorValues[NUM_SENSORS];
 unsigned int left_thresh = 600;
 unsigned int center_thresh = 600;
 unsigned int right_thresh = 600;
+// Declare some toggles
 boolean toggleFan = false;
 boolean toggleMove = true;
 boolean moveUsingDistance = false;
+
+// Set pins for hardware
 int analogFirePin = A0;
 int digitalFirePin = 5;
 int fireSensorValue = 0;
@@ -43,12 +55,16 @@ Servo rightWheel;
 
 void setup()
 {
+  // Configure fan
   pinMode(3, OUTPUT);
   pinMode(4, OUTPUT);
+  // Configure LED
   pinMode(ledin, OUTPUT);
   pinMode(ledout, OUTPUT);
+  // Turn fan off (just in case)
   digitalWrite(3, LOW);
   digitalWrite(4, LOW);
+  // Configure motors
   leftWheel.attach(13);
   rightWheel.attach(12);
   Serial.begin(9600); // set the data rate in bits per second for serial data transmission
@@ -58,12 +74,18 @@ void setup()
 
 void loop()
 {
+  // Read sensors
   int fireSensorValue = digitalRead(digitalFirePin);
   float distance = analogRead(1);
-  Serial.print("Distance sensor: ");
+  // Project to serial monitor
+  Serial.print("Distance: \t");
   Serial.println(distance);
+  Serial.print("Fire: \t");
   Serial.println(fireSensorValue);
-  digitalWrite(ledin, LOW);
+  
+  digitalWrite(ledin, LOW); // Turn off LED (just in case)
+  
+  // Check for fires
   if(fireSensorValue != 1){
     toggleFan = false;
   }
@@ -71,35 +93,35 @@ void loop()
     toggleFan = true;
   }
 
-  if(toggleFan != true){
-    leftWheel.writeMicroseconds(1500);
+  if(toggleFan != true){ // If there's a fire...
+    leftWheel.writeMicroseconds(1500); // Stop,
     rightWheel.writeMicroseconds(1500);
-    digitalWrite(3, LOW);
+    digitalWrite(3, LOW); // Then use the fan to extinguish it,
     digitalWrite(4, HIGH);
-    digitalWrite(ledin, HIGH);
-    delay(2500);
-    toggleMove = false;
+    digitalWrite(ledin, HIGH); // And finally, use the LED to make sure observers know what's going on
+    delay(2500); // Wait for the fire to be extinguished
+    toggleMove = false; // Prevent further movement
   }
-  else if(toggleMove != true){
-    leftWheel.writeMicroseconds(1500);
+  else if(toggleMove != true){ // Prevent further movement if the fire has been extinguished
+    leftWheel.writeMicroseconds(1500); // Stop
     rightWheel.writeMicroseconds(1500);
-    digitalWrite(3, LOW);
+    digitalWrite(3, LOW); // Ensure fan is off
     digitalWrite(4, LOW);
-    digitalWrite(ledin, LOW);
+    digitalWrite(ledin, LOW); // Turn LED off
   }
   else if (distance > 300){
-    leftWheel.writeMicroseconds(1500);
+    leftWheel.writeMicroseconds(1500); // Stop, you're about to hit an obstacle
     rightWheel.writeMicroseconds(1500);
-    digitalWrite(3, LOW);
+    digitalWrite(3, LOW); // Turn the fan off (just in case)
     digitalWrite(4, LOW);
-    digitalWrite(ledin, HIGH);
+    digitalWrite(ledin, HIGH); // Turn on the LED to let observers know something is happening
     delay(100);
   }    
   else
   {
-    digitalWrite(3, LOW);
+    digitalWrite(3, LOW); // Turn the fan off (just in case)
     digitalWrite(4, LOW);
-    digitalWrite(ledin, LOW);
+    digitalWrite(ledin, LOW); // Turn the LED off (just in case)
     // read raw sensor values
     qtrrc.read(sensorValues);
 
@@ -173,8 +195,11 @@ void loop()
       delay(05);
     }
     else {                         //TAPE IS NOT DOING WHAT IS EXPECTED     DO SOMETHING
+      // Spin until you can find tape again
       leftWheel.writeMicroseconds(1490);
       rightWheel.writeMicroseconds(1490);
+      // Activate the search for the tape
+      // Activate motion based on distance sensor values
       moveUsingDistance = true;
       delay(250);
       Serial.println("No tape found!");
