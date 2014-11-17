@@ -142,7 +142,7 @@ void loop()
     else {
       center=0;
     }
-    Serial.pint(center);
+    Serial.print(center);
     Serial.print('\t'); // tab to format the raw data into columns in the Serial monitor
 
     if(sensorValues[1]>right_thresh){
@@ -159,45 +159,45 @@ void loop()
     }
     if ((center && !left && !right) || (center && left && right)){ //TAPE IS IN THE CENTER BUT NOT ON THE SIDES  GO STRAIGHT
 
-      leftWheel.writeMicroseconds(1450);
-      rightWheel.writeMicroseconds(1550);
+      leftWheel.writeMicroseconds(1460);
+      rightWheel.writeMicroseconds(1540);
       Serial.println("In the center");
       delay(10);
     }
     else if (left && center && !right){//TAPE IS IN THE LEFT AND CENTER BUT NOT ON THE RIGHT   TURN LEFT 
-      leftWheel.writeMicroseconds(1450);
+      leftWheel.writeMicroseconds(1460);
       rightWheel.writeMicroseconds(1505);
       Serial.println("Too far right");
       delay(05);
     }
     else if (right && center && !left){//TAPE IS IN THE RIGHT AND CENTER BUT NOT ON THE RIGHT   TURN RIGHT
       leftWheel.writeMicroseconds(1495);
-      rightWheel.writeMicroseconds(1550);
+      rightWheel.writeMicroseconds(1540);
       Serial.println("Too far left");
       delay(05); 
     }
     else if (left && !center && !right){ // TOO FAR LEFT
-      leftWheel.writeMicroseconds(1450);
+      leftWheel.writeMicroseconds(1460);
       rightWheel.writeMicroseconds(1505);
       Serial.println("Much too far right");
       delay(05);
     }
     else if (!left && !center && right){ // TOO FAR RIGHT
       leftWheel.writeMicroseconds(1495);
-      rightWheel.writeMicroseconds(1550);
+      rightWheel.writeMicroseconds(1540);
       Serial.println("Much too far left");
       delay(05);
     }
     else if ( left && !center && right){
-      leftWheel.writeMicroseconds(1450);
-      rightWheel.writeMicroseconds(1550);
+      leftWheel.writeMicroseconds(1460);
+      rightWheel.writeMicroseconds(1540);
       Serial.println("Something weird is happening, but moving forward anyway");
       delay(05);
     }
     else {                         //TAPE IS NOT DOING WHAT IS EXPECTED     DO SOMETHING
       // Spin until you can find tape again
-      leftWheel.writeMicroseconds(1465);
-      rightWheel.writeMicroseconds(1465);
+      leftWheel.writeMicroseconds(1460);
+      rightWheel.writeMicroseconds(1460);
       // Activate the search for the tape
       // Activate motion based on distance sensor values
       moveUsingDistance = true;
